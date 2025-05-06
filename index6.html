@@ -15,27 +15,23 @@
             margin: 0;
             padding: 0;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            /* Solid dark background as fallback and base */
             background-color: #050515;
             color: #e0e0e0;
             min-height: 100vh;
             perspective: 1000px;
-            overflow: hidden; /* Prevent scrollbars from canvas/content */
+            overflow: hidden;
         }
 
-        /* Canvas Styling */
         #starfield {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            z-index: -10; /* Behind everything */
-            display: block; /* Prevent extra space */
+            z-index: -10;
+            display: block;
         }
 
-
-        /* --- Content Styling (Mostly unchanged from v2) --- */
         .content-wrapper {
             display: flex;
             flex-direction: column;
@@ -44,8 +40,8 @@
             min-height: 100vh;
             padding: 50px 20px;
             box-sizing: border-box;
-            position: relative; /* Ensure stacking context */
-            z-index: 1; /* Above canvas */
+            position: relative;
+            z-index: 1;
         }
 
         .container {
@@ -58,12 +54,11 @@
             width: 90%;
             text-align: center;
             position: relative;
-            z-index: 1; /* Above wrapper background, below its own children if needed */
+            z-index: 1;
             transition: transform 0.1s ease-out, box-shadow 0.3s ease;
             overflow: hidden;
         }
 
-        /* Shine Effect (Unchanged) */
         .container::before {
             content: '';
             position: absolute;
@@ -76,11 +71,10 @@
         .container:hover::before { left: 150%; }
         .container:hover { box-shadow: 0 0 50px var(--glow-color), inset 0 0 15px rgba(200, 200, 255, 0.2); }
 
-        /* Text, Form, Flags, Footer Styling (Unchanged from v2) */
         h1 {
             color: #f0f0ff; margin-bottom: 15px; font-size: 2.8em;
             text-shadow: 0 0 8px #fff, 0 0 15px var(--glow-color); font-weight: 600;
-            position: relative; z-index: 3; /* Ensure text is above shine */
+            position: relative; z-index: 3;
         }
         p {
             font-size: 1.15em; line-height: 1.7; color: #d0d0f0; margin-bottom: 30px;
@@ -114,28 +108,35 @@
 
         /* --- Social Media Icons --- */
         .social-media-icons {
-            margin-top: 35px; /* Matches margin of support-flags */
+            margin-top: 30px; /* Adjusted margin */
             display: flex;
             justify-content: center;
-            align-items: center;
-            gap: 20px; /* Space between icons */
+            align-items: flex-start; /* Align items to the start for consistent label positioning */
+            gap: 25px; /* Space between each social item group */
             position: relative;
-            z-index: 3; /* Consistent with other interactive elements */
+            z-index: 3;
+        }
+
+        .social-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px; /* Space between icon and its label */
         }
 
         .social-icon {
-            display: inline-flex; /* Helps center inner elements if any */
+            display: inline-flex;
             align-items: center;
             justify-content: center;
             width: 44px;
             height: 44px;
-            border: 2px solid rgba(200, 200, 255, 0.25); /* Subtle border */
-            border-radius: 50%; /* Circular buttons */
-            color: #e0e0f0; /* Icon color base */
+            border: 2px solid rgba(200, 200, 255, 0.25);
+            border-radius: 50%;
+            color: #e0e0f0;
             text-decoration: none;
             transition: background-color 0.3s ease, border-color 0.3s ease, transform 0.2s ease;
-            position: relative; /* Crucial for absolute positioning of pseudo-elements/children */
-            overflow: hidden; /* Clip any parts of icons drawn outside */
+            position: relative;
+            overflow: hidden;
         }
 
         .social-icon:hover {
@@ -144,9 +145,16 @@
             transform: translateY(-2px) scale(1.05);
         }
 
+        .social-label {
+            font-size: 0.7em; /* Smaller font for labels */
+            color: #a0a0c0;   /* Subdued color, similar to support flags p */
+            text-align: center;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+
         /* TikTok Icon (Simplified Musical Note - Quaver/Eighth Note) */
-        /* The <i> elements are direct children of .tiktok-icon */
-        .tiktok-icon > .tiktok-head { /* More specific selector */
+        .tiktok-icon > .tiktok-head {
             position: absolute;
             width: 8px;
             height: 8px;
@@ -155,53 +163,51 @@
             bottom: 12px;
             left: 13px;
         }
-        .tiktok-icon > .tiktok-stem { /* More specific selector */
+        .tiktok-icon > .tiktok-stem {
             position: absolute;
-            width: 3.5px; /* Slightly thicker stem */
+            width: 3.5px;
             height: 14px;
             background-color: #e0e0f0;
-            left: 19px; /* Aligns with right of head */
-            bottom: 14px; /* Connects to head level */
+            left: 19px;
+            bottom: 14px;
             border-radius: 1px;
         }
-        .tiktok-icon > .tiktok-flag { /* More specific selector */
+        .tiktok-icon > .tiktok-flag {
             position: absolute;
-            width: 11px; /* Width of the flag */
-            height: 9px;  /* Height of the flag curve */
-            border-top: 3.5px solid #e0e0f0; /* Top stroke of the flag */
-            border-radius: 0 0 8px 8px / 0 0 6px 6px; /* Elliptical bottom curve */
-            left: 19px; /* Aligns with stem */
-            bottom: 23px; /* Position at top of stem */
-            transform: translateX(0.5px); /* Fine-tune connection to stem */
+            width: 11px;
+            height: 9px;
+            border-top: 3.5px solid #e0e0f0;
+            border-radius: 0 0 8px 8px / 0 0 6px 6px;
+            left: 19px;
+            bottom: 23px;
+            transform: translateX(0.5px);
         }
 
-
         /* Telegram Icon (Paper Plane Style) */
-        .telegram-icon::before { /* Main body - top part of plane */
+        .telegram-icon::before {
             content: '';
             position: absolute;
             width: 0;
             height: 0;
             border-style: solid;
-            border-width: 0 0 10px 18px; /* triangle pointing right-up after rotation */
+            border-width: 0 0 10px 18px;
             border-color: transparent transparent transparent #e0e0f0;
-            top: 11px;  /* Positioned towards top-left for rotation */
+            top: 11px;
             left: 11px;
             transform: rotate(-35deg) scale(0.9);
         }
-        .telegram-icon::after { /* Bottom wing/part of plane */
+        .telegram-icon::after {
             content: '';
             position: absolute;
             width: 0;
             height: 0;
             border-style: solid;
-            border-width: 10px 18px 0 0; /* triangle pointing right-down after rotation */
-            border-color: #b5b5d5 transparent transparent transparent; /* Slightly different shade for depth, or use #e0e0f0 */
-            top: 18px; /* Positioned towards bottom-left for rotation */
+            border-width: 10px 18px 0 0;
+            border-color: #b5b5d5 transparent transparent transparent;
+            top: 18px;
             left: 11px;
-            transform: rotate(-35deg) scale(0.9) translateY(0.5px); /* Slight adjustment */
+            transform: rotate(-35deg) scale(0.9) translateY(0.5px);
         }
-
 
         /* YouTube Icon (Play Button) */
         .youtube-icon::before {
@@ -210,29 +216,26 @@
             width: 0;
             height: 0;
             border-style: solid;
-            border-width: 7px 0 7px 12px; /* Height 14px, base 12px, pointing right */
+            border-width: 7px 0 7px 12px;
             border-color: transparent transparent transparent #e0e0f0;
-            /* Centering */
             top: 50%;
             left: 50%;
-            transform: translate(-40%, -50%); /* Adjust -40% for triangle's left point origin */
+            transform: translate(-40%, -50%);
         }
 
     </style>
 </head>
 <body>
 
-    <!-- Canvas for Starfield -->
     <canvas id="starfield"></canvas>
 
-    <!-- Main Content Area -->
     <div class="content-wrapper">
         <div class="container" id="interactive-container">
             <h1>galaxywonderland.com</h1>
             <p>Добро пожаловать в Галактику Чудес v3! Получите мистическое таро-чтение в окружении живого звездного неба.</p>
 
             <div class="form-container">
-                <form action="#" method="post"> <!-- Replace # with your form processing URL -->
+                <form action="#" method="post">
                     <label for="name">Имя:</label>
                     <input type="text" id="name" name="name" required>
 
@@ -249,24 +252,33 @@
                 <p>Мы поддерживаем разнообразие и суверенитет.</p>
             </div>
 
-            <!-- START: Added Social Media Icons -->
+            <!-- START: Added Social Media Icons with Labels -->
             <div class="social-media-icons">
-                <a href="#" aria-label="TikTok" class="social-icon tiktok-icon" target="_blank" rel="noopener noreferrer">
-                    <i class="tiktok-stem"></i>
-                    <i class="tiktok-head"></i>
-                    <i class="tiktok-flag"></i>
-                </a>
-                <a href="#" aria-label="Telegram" class="social-icon telegram-icon" target="_blank" rel="noopener noreferrer">
-                    <!-- CSS drawn via pseudo-elements -->
-                </a>
-                <a href="#" aria-label="YouTube" class="social-icon youtube-icon" target="_blank" rel="noopener noreferrer">
-                    <!-- CSS drawn via pseudo-elements -->
-                </a>
+                <div class="social-item">
+                    <a href="#" aria-label="TikTok" class="social-icon tiktok-icon" target="_blank" rel="noopener noreferrer">
+                        <i class="tiktok-stem"></i>
+                        <i class="tiktok-head"></i>
+                        <i class="tiktok-flag"></i>
+                    </a>
+                    <span class="social-label">TikTok</span>
+                </div>
+                <div class="social-item">
+                    <a href="#" aria-label="Telegram" class="social-icon telegram-icon" target="_blank" rel="noopener noreferrer">
+                        <!-- CSS drawn via pseudo-elements -->
+                    </a>
+                    <span class="social-label">Telegram</span>
+                </div>
+                <div class="social-item">
+                    <a href="#" aria-label="YouTube" class="social-icon youtube-icon" target="_blank" rel="noopener noreferrer">
+                        <!-- CSS drawn via pseudo-elements -->
+                    </a>
+                    <span class="social-label">YouTube</span>
+                </div>
             </div>
-            <!-- END: Added Social Media Icons -->
+            <!-- END: Added Social Media Icons with Labels -->
 
-        </div> <!-- End container -->
-    </div> <!-- End content-wrapper -->
+        </div>
+    </div>
 
     <footer>
         © galaxywonderland.com. All rights registered and already corrupted. | JS Starfield Version
@@ -278,101 +290,73 @@
         const ctx = canvas.getContext('2d');
 
         let stars = [];
-        const numStars = 300; // Adjust density
-        const baseSpeedFactor = 0.03; // Base speed multiplier
-        const shootingStarProbability = 0.0015; // Chance per frame a star might shoot (lower = rarer)
-        const shootingSpeedFactor = 8; // How much faster shooting stars are
-        const maxTailLength = 30; // Max segments in a shooting star's tail
-
-        let activeShootingStar = null; // Reference to the currently shooting star, if any
+        const numStars = 300;
+        const baseSpeedFactor = 0.03;
+        const shootingStarProbability = 0.0015;
+        const shootingSpeedFactor = 8;
+        const maxTailLength = 30;
+        let activeShootingStar = null;
 
         function setCanvasSize() {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
         }
 
-        // Initialize or reset stars
         function initStars() {
-            stars = []; // Clear existing stars
-            activeShootingStar = null; // Reset active shooter
+            stars = [];
+            activeShootingStar = null;
             for (let i = 0; i < numStars; i++) {
                 stars.push(createStar());
              }
         }
 
-        // Function to create a single star object
         function createStar(yPos = Math.random() * canvas.height) {
-             const radius = Math.random() * 1.5 + 0.5; // Range 0.5 to 2.0
+             const radius = Math.random() * 1.5 + 0.5;
              return {
                 x: Math.random() * canvas.width,
                 y: yPos,
                 radius: radius,
-                alpha: Math.random() * 0.5 + 0.5, // Opacity 0.5 to 1.0
-                speed: radius * baseSpeedFactor + 0.02, // Speed based on radius (parallax) + minimum base
-                // --- Shooting Star Properties ---
+                alpha: Math.random() * 0.5 + 0.5,
+                speed: radius * baseSpeedFactor + 0.02,
                 isShooting: false,
                 shootingAngle: 0,
                 shootingSpeed: 0,
-                tail: [], // Array to store tail points {x, y, alpha}
-                originalAlpha: 0 // Store original alpha when shooting starts
+                tail: [],
+                originalAlpha: 0
             };
         }
 
-        // --- Trigger Shooting Star ---
         function tryStartShootingStar() {
-            // Only one shooting star at a time, and only if probability met
             if (activeShootingStar || Math.random() > shootingStarProbability || stars.length === 0) {
                 return;
             }
-
-            // Select a random non-shooting star
             let candidate = null;
             let attempts = 0;
-            while (!candidate && attempts < stars.length) { // Prevent infinite loop if all stars somehow fail
+            while (!candidate && attempts < stars.length) {
                  let potentialStar = stars[Math.floor(Math.random() * stars.length)];
                  if (!potentialStar.isShooting) {
                       candidate = potentialStar;
                  }
                  attempts++;
             }
-
-
             if (candidate) {
                 activeShootingStar = candidate;
                 candidate.isShooting = true;
-                candidate.originalAlpha = candidate.alpha; // Store current alpha
-
-                // Make it brighter
+                candidate.originalAlpha = candidate.alpha;
                 candidate.alpha = 1.0;
-
-                // Calculate angle (mostly downwards, with slight random horizontal component)
-                const angleVariation = (Math.random() - 0.5) * (Math.PI / 6); // +/- 15 degrees from vertical
-                candidate.shootingAngle = (Math.PI / 2) + angleVariation; // PI/2 is straight down
-
-                // Calculate speed
-                candidate.shootingSpeed = (candidate.radius * baseSpeedFactor * shootingSpeedFactor) + 1; // Significantly faster
-
-                // Start position (optional: reset to top?)
-                 // candidate.y = -candidate.radius;
-                 // candidate.x = Math.random() * canvas.width;
-
-                candidate.tail = []; // Clear any old tail data
+                const angleVariation = (Math.random() - 0.5) * (Math.PI / 6);
+                candidate.shootingAngle = (Math.PI / 2) + angleVariation;
+                candidate.shootingSpeed = (candidate.radius * baseSpeedFactor * shootingSpeedFactor) + 1;
+                candidate.tail = [];
             }
         }
 
-
-        // --- Draw ---
         function drawStars() {
-            // Clear canvas (or use gradient)
-            // ctx.clearRect(0, 0, canvas.width, canvas.height);
             const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
             gradient.addColorStop(0, '#0a0a2a');
             gradient.addColorStop(1, '#050515');
             ctx.fillStyle = gradient;
             ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-
-            // Draw each star
             stars.forEach(star => {
                 if (star.isShooting) {
                     drawShootingStar(star);
@@ -390,38 +374,26 @@
         }
 
         function drawShootingStar(star) {
-            // Draw Tail
             ctx.beginPath();
-            ctx.moveTo(star.x, star.y); // Start from the current head position
-
+            ctx.moveTo(star.x, star.y);
             for (let i = star.tail.length - 1; i >= 0; i--) {
                  const segment = star.tail[i];
-                 const segmentAlpha = segment.alpha * (i / star.tail.length); // Fade out along tail
                  ctx.lineTo(segment.x, segment.y);
              }
-
-             ctx.lineWidth = star.radius * 1.5; // Tail width based on star size
-             ctx.strokeStyle = `rgba(255, 255, 240, ${star.alpha * 0.6})`; // Tail color/opacity
+             ctx.lineWidth = star.radius * 1.5;
+             ctx.strokeStyle = `rgba(255, 255, 240, ${star.alpha * 0.6})`;
              ctx.stroke();
-
-
-            // Draw Head (brighter, maybe slightly bigger or with glow)
             ctx.beginPath();
-            ctx.arc(star.x, star.y, star.radius * 1.2, 0, Math.PI * 2); // Slightly bigger head
-            ctx.fillStyle = `rgba(255, 255, 255, ${star.alpha})`; // Bright white head
+            ctx.arc(star.x, star.y, star.radius * 1.2, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(255, 255, 255, ${star.alpha})`;
             ctx.shadowColor = 'rgba(255, 255, 255, 0.8)';
-            ctx.shadowBlur = 8; // Add glow to head
+            ctx.shadowBlur = 8;
             ctx.fill();
-            ctx.shadowBlur = 0; // Reset shadow blur
-
+            ctx.shadowBlur = 0;
         }
 
-
-        // --- Update ---
         function updateStars() {
-             // Check if we should start a new shooting star
             tryStartShootingStar();
-
             stars.forEach((star, index) => {
                 if (star.isShooting) {
                     updateShootingStar(star);
@@ -432,66 +404,48 @@
         }
 
         function updateNormalStar(star, index) {
-             star.y += star.speed; // Simple vertical movement
-
-            // Reset star if it goes off screen
-            if (star.y > canvas.height + star.radius * 5) { // Give some buffer
-                stars[index] = createStar(-star.radius); // Start just above the top
+             star.y += star.speed;
+            if (star.y > canvas.height + star.radius * 5) {
+                stars[index] = createStar(-star.radius);
             }
         }
 
         function updateShootingStar(star) {
-            // Add current position to the start of the tail
             star.tail.unshift({ x: star.x, y: star.y, alpha: star.alpha });
-
-             // Keep tail length limited
             if (star.tail.length > maxTailLength) {
                 star.tail.pop();
             }
-
-             // Move star based on angle and speed
             star.x += Math.cos(star.shootingAngle) * star.shootingSpeed;
             star.y += Math.sin(star.shootingAngle) * star.shootingSpeed;
-
-
-            // Check if shooting star is off-screen (consider X and Y)
             const offScreenX = star.x < -star.radius * 5 || star.x > canvas.width + star.radius * 5;
-            const offScreenY = star.y < -star.radius * 5 || star.y > canvas.height + star.radius * 5; // Generous bounds
-
+            const offScreenY = star.y < -star.radius * 5 || star.y > canvas.height + star.radius * 5;
              if (offScreenX || offScreenY) {
                  star.isShooting = false;
-                 star.alpha = star.originalAlpha; // Restore original alpha
-                 star.tail = []; // Clear tail
-                 star.x = Math.random() * canvas.width; // Reset position
-                 star.y = -star.radius; // Reset position above screen
-                 activeShootingStar = null; // Allow another one to start
+                 star.alpha = star.originalAlpha;
+                 star.tail = [];
+                 star.x = Math.random() * canvas.width;
+                 star.y = -star.radius;
+                 activeShootingStar = null;
              }
         }
 
-
-        // Animation loop
         function animate() {
             updateStars();
             drawStars();
-            requestAnimationFrame(animate); // Loop
+            requestAnimationFrame(animate);
         }
 
-        // Event listener for resize
         window.addEventListener('resize', () => {
             setCanvasSize();
-            initStars(); // Reinitialize stars for new dimensions
+            initStars();
         });
 
-        // Initial setup
         setCanvasSize();
         initStars();
-        animate(); // Start animation
+        animate();
 
-
-        // --- Mouse Tilt Effect (Unchanged) ---
         const container = document.getElementById('interactive-container');
         const wrapper = document.querySelector('.content-wrapper');
-
         wrapper.addEventListener('mousemove', (e) => {
             const rect = wrapper.getBoundingClientRect();
             const x = e.clientX - rect.left; const y = e.clientY - rect.top;
@@ -503,7 +457,6 @@
         wrapper.addEventListener('mouseleave', () => {
             container.style.transform = 'rotateY(0deg) rotateX(0deg)';
         });
-
     </script>
 
 </body>
