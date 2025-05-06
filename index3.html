@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Galaxy Wonderland v3 - JS Starfield</title>
+    <meta name="description" content="Получите точное таро-чтение онлайн от опытного местного мага на Galaxy Wonderland. Узнайте свое будущее сегодня!">
+    <style>
+        :root {
+            --glow-color: rgba(170, 170, 255, 0.5);
+            --shine-color: rgba(255, 255, 255, 0.2);
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            /* Solid dark background as fallback and base */
+            background-color: #050515;
+            color: #e0e0e0;
+            min-height: 100vh;
+            perspective: 1000px;
+            overflow: hidden; /* Prevent scrollbars from canvas/content */
+        }
+
+        /* Canvas Styling */
+        #starfield {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -10; /* Behind everything */
+            display: block; /* Prevent extra space */
+        }
+
+
+        /* --- Content Styling (Mostly unchanged from v2) --- */
+        .content-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 50px 20px;
+            box-sizing: border-box;
+            position: relative; /* Ensure stacking context */
+            z-index: 1; /* Above canvas */
+        }
+
+        .container {
+            background-color: rgba(15, 15, 35, 0.7);
+            backdrop-filter: blur(5px);
+            padding: 35px 40px;
+            border-radius: 20px;
+            box-shadow: 0 0 35px var(--glow-color), inset 0 0 10px rgba(200, 200, 255, 0.1);
+            max-width: 650px;
+            width: 90%;
+            text-align: center;
+            position: relative;
+            z-index: 1; /* Above wrapper background, below its own children if needed */
+            transition: transform 0.1s ease-out, box-shadow 0.3s ease;
+            overflow: hidden;
+        }
+
+        /* Shine Effect (Unchanged) */
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%; width: 50%; height: 100%;
+            background: linear-gradient(to right, transparent 0%, var(--shine-color) 50%, transparent 100%);
+            transform: skewX(-25deg);
+            transition: left 0.6s ease-in-out;
+            z-index: 2; pointer-events: none;
+        }
+        .container:hover::before { left: 150%; }
+        .container:hover { box-shadow: 0 0 50px var(--glow-color), inset 0 0 15px rgba(200, 200, 255, 0.2); }
+
+        /* Text, Form, Flags, Footer Styling (Unchanged from v2) */
+        h1 {
+            color: #f0f0ff; margin-bottom: 15px; font-size: 2.8em;
+            text-shadow: 0 0 8px #fff, 0 0 15px var(--glow-color); font-weight: 600;
+            position: relative; z-index: 3; /* Ensure text is above shine */
+        }
+        p {
+            font-size: 1.15em; line-height: 1.7; color: #d0d0f0; margin-bottom: 30px;
+            position: relative; z-index: 3;
+        }
+        .form-container { margin-top: 25px; text-align: left; position: relative; z-index: 3; }
+        .form-container label { display: block; margin-bottom: 10px; color: #c0c0e0; font-weight: bold; font-size: 1.05em; }
+        .form-container input[type="text"],
+        .form-container textarea {
+            width: calc(100% - 24px); padding: 12px; margin-bottom: 25px; border: 1px solid #5a5a8a;
+            border-radius: 8px; background-color: rgba(30, 30, 60, 0.8); color: #e0e0e0; font-size: 1em;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        .form-container input[type="text"]:focus,
+        .form-container textarea:focus { outline: none; border-color: #a0a0ff; box-shadow: 0 0 10px rgba(160, 160, 255, 0.5); }
+        .form-container textarea { min-height: 110px; resize: vertical; }
+        .form-container button {
+            background: linear-gradient(45deg, #7b68ee, #9370db); color: white; padding: 15px 30px; border: none;
+            border-radius: 8px; font-size: 1.2em; font-weight: bold; cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.3s ease, background 0.3s ease; display: block;
+            width: 100%; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); position: relative; z-index: 3;
+        }
+        .form-container button:hover { background: linear-gradient(45deg, #6a5acd, #8a63c7); transform: translateY(-3px); box-shadow: 0 8px 25px rgba(123, 104, 238, 0.5); }
+        .form-container button:active { transform: translateY(-1px); box-shadow: 0 4px 15px rgba(123, 104, 238, 0.4); }
+        .support-flags { margin-top: 35px; font-size: 2.2em; position: relative; z-index: 3; }
+        .support-flags p { font-size: 0.6em; margin-top: 8px; color: #a0a0c0; }
+        footer {
+            padding: 20px; text-align: center; font-size: 0.9em; color: #8888a8;
+            width: 100%; margin-top: 30px; position: relative; z-index: 1;
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- Canvas for Starfield -->
+    <canvas id="starfield"></canvas>
+
+    <!-- Main Content Area -->
+    <div class="content-wrapper">
+        <div class="container" id="interactive-container">
+            <h1>galaxywonderland.com</h1>
+            <p>Добро пожаловать в Галактику Чудес v3! Получите мистическое таро-чтение в окружении живого звездного неба.</p>
+
+            <div class="form-container">
+                <form action="#" method="post"> <!-- Replace # with your form processing URL -->
+                    <label for="name">Имя:</label>
+                    <input type="text" id="name" name="name" required>
+
+                    <label for="question">Ваш вопрос к картам Таро:</label>
+                    <textarea id="question" name="question" required></textarea>
+
+                    <button type="submit">Задать вопрос Магу</button>
+                </form>
+            </div>
+
+            <div class="support-flags">
+                <span>🏳️‍🌈</span>
+                <span style="margin-left: 15px;">🇺🇦</span>
+                <p>Мы поддерживаем разнообразие и суверенитет.</p>
+            </div>
+        </div> <!-- End container -->
+    </div> <!-- End content-wrapper -->
+
+    <footer>
+        © galaxywonderland.com. All rights registered and already corrupted. | JS Starfield Version
+    </footer>
+
+    <script>
+        // --- Starfield Canvas ---
+        const canvas = document.getElementById('starfield');
+        const ctx = canvas.getContext('2d');
+
+        let stars = [];
+        const numStars = 300; // Adjust density
+        const speedFactor = 0.05; // Adjust overall speed
+
+        function setCanvasSize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+
+        // Initialize or reset stars
+        function initStars() {
+            stars = []; // Clear existing stars
+            for (let i = 0; i < numStars; i++) {
+                stars.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    // Radius determines size and speed (parallax)
+                    radius: Math.random() * 1.5 + 0.5, // Range 0.5 to 2.0
+                    alpha: Math.random() * 0.5 + 0.5, // Opacity 0.5 to 1.0
+                    // Speed derived from radius - smaller stars move slower (further away)
+                    speed: (Math.random() * 1.5 + 0.5) * speedFactor // Use radius directly for speed correlation
+                });
+             }
+        }
+
+        function drawStars() {
+            // Clear canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+             // Optional: subtle background gradient
+            const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+            gradient.addColorStop(0, '#0a0a2a'); // Darker top
+            gradient.addColorStop(1, '#050515'); // Slightly lighter bottom/base
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+
+            // Draw each star
+            stars.forEach(star => {
+                ctx.beginPath();
+                ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(255, 255, 255, ${star.alpha})`; // White stars with varying opacity
+                ctx.fill();
+            });
+        }
+
+        function updateStars() {
+            stars.forEach(star => {
+                star.y += star.speed * star.radius; // Y increases downwards, speed modulated by radius
+
+                // Reset star if it goes off screen
+                if (star.y > canvas.height + star.radius) {
+                    star.y = -star.radius; // Start just above the top
+                    star.x = Math.random() * canvas.width;
+                    // Optionally re-randomize radius/speed on reset
+                    // star.radius = Math.random() * 1.5 + 0.5;
+                    // star.speed = star.radius * speedFactor;
+                }
+            });
+        }
+
+        // Animation loop
+        function animate() {
+            updateStars();
+            drawStars();
+            requestAnimationFrame(animate); // Loop
+        }
+
+        // Event listener for resize
+        window.addEventListener('resize', () => {
+            setCanvasSize();
+            initStars(); // Reinitialize stars for new dimensions
+        });
+
+        // Initial setup
+        setCanvasSize();
+        initStars();
+        animate(); // Start animation
+
+
+        // --- Mouse Tilt Effect (Unchanged from v2) ---
+        const container = document.getElementById('interactive-container');
+        const wrapper = document.querySelector('.content-wrapper');
+
+        wrapper.addEventListener('mousemove', (e) => {
+            const rect = wrapper.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            const centerX = rect.width / 2;
+            const centerY = rect.height / 2;
+            const deltaX = (x - centerX) / centerX;
+            const deltaY = (y - centerY) / centerY;
+            const maxRotate = 5;
+            container.style.transform = `rotateY(${deltaX * maxRotate * -1}deg) rotateX(${deltaY * maxRotate}deg)`;
+        });
+
+        wrapper.addEventListener('mouseleave', () => {
+            container.style.transform = 'rotateY(0deg) rotateX(0deg)';
+        });
+
+    </script>
+
+</body>
+</html>

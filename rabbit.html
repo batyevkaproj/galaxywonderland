@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rabbit Sticker</title>
+
+    <!-- CSS Styles embedded within the HTML -->
+    <style>
+        /* Basic body style for testing */
+        body {
+            min-height: 100vh;
+            background-color: #f0f0f0; /* Light grey to see the white rabbit */
+            font-family: sans-serif;
+            margin: 0; /* Remove default body margin */
+            padding: 0; /* Remove default body padding */
+        }
+
+        /* Add padding/margin to content so it's not under the fixed sticker */
+        h1, p {
+             padding: 30px 30px 30px 270px; /* Adjust left padding to clear the 250px sticker + some space */
+        }
+
+        /* Style for the container */
+        #rabbit-sticker-container {
+            position: fixed; /* Position relative to the viewport */
+            top: 0;
+            left: 0;
+            width: 250px;
+            height: 250px;
+            z-index: 1000; /* Ensure it stays on top of other content */
+            overflow: hidden; /* Hide parts of the image if animation makes it larger */
+            pointer-events: none; /* Allows clicking through the container if needed */
+        }
+
+        /* Style for the rabbit image */
+        #rabbit-sticker-img {
+            display: block; /* Removes potential extra space below image */
+            width: 100%;
+            height: 100%;
+            object-fit: contain; /* Scale the image down to fit, maintaining aspect ratio */
+
+            /* Apply the animation */
+            animation: nfsGlitch 2.5s infinite alternate ease-in-out;
+        }
+
+        /* Animation Keyframes - Simulating a glitchy/sticker effect */
+        @keyframes nfsGlitch {
+            0%, 100% {
+                opacity: 0.9;
+                transform: translate(0, 0) skew(0deg);
+                filter: brightness(1);
+            }
+            10% {
+                opacity: 0.7;
+                transform: translate(-3px, 2px) skew(-2deg);
+            }
+            20% {
+                opacity: 1;
+                transform: translate(2px, -1px) skew(1deg);
+                filter: brightness(1.3);
+            }
+            30% {
+                 /* Quick flash off */
+                opacity: 0.4;
+                transform: translate(1px, 1px) skew(0);
+            }
+            35% {
+                /* Back on */
+                opacity: 0.9;
+                 transform: translate(0, 0) skew(0);
+                 filter: brightness(1);
+            }
+            /* Longer pause */
+            70% {
+                opacity: 0.9;
+                transform: translate(0, 0) skew(0);
+                 filter: brightness(1);
+            }
+            80% {
+                opacity: 1;
+                transform: translate(3px, 3px) skew(1.5deg);
+                filter: brightness(0.8);
+            }
+            90% {
+                opacity: 0.6;
+                transform: translate(-2px, -3px) skew(-1deg);
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Page Content Goes Here</h1>
+    <p>Some other content on the page... This content should appear to the right of the sticker area.</p>
+    <p>More content...</p>
+    <p>Even more content...</p>
+
+    <!-- JavaScript embedded within the HTML, placed before closing </body> -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // --- Configuration ---
+            // !!! IMPORTANT: Change this if your image is named differently or is in another folder !!!
+            const rabbitImageSrc = 'WhiteRabbit.jpg';
+            // -------------------
+
+            // 1. Create the main container div
+            const container = document.createElement('div');
+            container.id = 'rabbit-sticker-container';
+
+            // 2. Create the image element
+            const rabbitImg = document.createElement('img');
+            rabbitImg.id = 'rabbit-sticker-img';
+            rabbitImg.src = rabbitImageSrc;
+            rabbitImg.alt = 'Animated White Rabbit';
+
+            // 3. Append the image to the container
+            container.appendChild(rabbitImg);
+
+            // 4. Append the container to the document's body
+            document.body.appendChild(container);
+
+            // Optional: Error handling if the image fails to load
+            rabbitImg.onerror = function() {
+                console.error("Error loading rabbit image:", rabbitImageSrc);
+                // Maybe hide the container or show a fallback
+                container.style.display = 'none';
+                alert(`Could not load the rabbit image: ${rabbitImageSrc}\nPlease ensure the image file exists in the same directory as the HTML file or update the path in the script.`);
+            };
+        });
+    </script>
+
+</body>
+</html>

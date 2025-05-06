@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Galaxy Wonderland - Таро от Местного Мага</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            /* Simple space gradient background */
+            background: linear-gradient(to bottom, #0a0a2a, #1a1a3a, #2a2a4a);
+            background-attachment: fixed;
+            color: #e0e0e0; /* Light text color */
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            box-sizing: border-box; /* Include padding in element's total width and height */
+        }
+
+        .container {
+            background-color: rgba(0, 0, 20, 0.6); /* Semi-transparent dark blue */
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 0 25px rgba(150, 150, 255, 0.3); /* Subtle glow effect */
+            max-width: 600px;
+            width: 90%;
+            text-align: center;
+            margin-bottom: 30px; /* Space before footer */
+        }
+
+        h1 {
+            color: #e6e6fa; /* Lavender color */
+            margin-bottom: 10px;
+            font-size: 2.5em;
+            text-shadow: 0 0 10px #aaaaff;
+        }
+
+        p {
+            font-size: 1.1em;
+            line-height: 1.6;
+            color: #c0c0e0; /* Lighter purple/blue text */
+            margin-bottom: 25px;
+        }
+
+        .form-container {
+            margin-top: 20px;
+            text-align: left;
+        }
+
+        .form-container label {
+            display: block;
+            margin-bottom: 8px;
+            color: #b0b0d0; /* Slightly muted label color */
+            font-weight: bold;
+        }
+
+        .form-container input[type="text"],
+        .form-container textarea {
+            width: calc(100% - 22px); /* Account for padding and border */
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #4a4a6a;
+            border-radius: 5px;
+            background-color: #1a1a3a; /* Dark input background */
+            color: #e0e0e0; /* Light text in input */
+            font-size: 1em;
+        }
+
+        .form-container textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .form-container button {
+            background-color: #7b68ee; /* Medium Slate Blue */
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            display: block;
+            width: 100%;
+        }
+
+        .form-container button:hover {
+            background-color: #6a5acd; /* Darker Slate Blue */
+        }
+
+        .support-flags {
+            margin-top: 30px;
+            font-size: 2em; /* Make flags larger */
+        }
+
+        footer {
+            margin-top: auto; /* Pushes footer to the bottom if content is short */
+            padding: 15px;
+            text-align: center;
+            font-size: 0.9em;
+            color: #8888a8; /* Muted footer text color */
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>galaxywonderland.com</h1>
+        <p>Добро пожаловать в Галактику Чудес! Получите мистическое таро-чтение от нашего местного мага, чтобы осветить свой путь.</p>
+
+        <div class="form-container">
+            <form action="#" method="post"> <!-- Replace # with your form processing URL -->
+                <label for="name">Имя:</label>
+                <input type="text" id="name" name="name" required>
+
+                <label for="question">Ваш вопрос к картам Таро:</label>
+                <textarea id="question" name="question" required></textarea>
+
+                <button type="submit">Задать вопрос Магу</button>
+            </form>
+        </div>
+
+        <div class="support-flags">
+            <span>🏳️‍🌈</span> <!-- LGBT+ Flag Emoji -->
+            <span style="margin-left: 15px;">🇺🇦</span> <!-- Ukraine Flag Emoji -->
+            <p style="font-size: 0.6em; margin-top: 5px; color: #a0a0c0;">Мы поддерживаем разнообразие и суверенитет.</p>
+        </div>
+    </div>
+
+    <footer>
+        © galaxywonderland.com. All rights registered and already corrupted.
+    </footer>
+
+</body>
+</html>

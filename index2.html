@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Galaxy Wonderland v2 - Анимированное Таро</title>
+    <style>
+        :root {
+            --glow-color: rgba(170, 170, 255, 0.5);
+            --shine-color: rgba(255, 255, 255, 0.2);
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            /* Base Layer - Deep Space */
+            background-color: #050515;
+            color: #e0e0e0;
+            min-height: 100vh;
+            /* Enable perspective for 3D transforms on children */
+            perspective: 1000px;
+            overflow-x: hidden; /* Prevent horizontal scrollbars from parallax */
+        }
+
+        /* Parallax Background Layers */
+        .parallax-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -10;
+            pointer-events: none; /* Allow clicks to pass through */
+        }
+
+        /* Layer 1: Distant Stars (slowest) */
+        .stars-far {
+            background: transparent radial-gradient(ellipse at center, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
+            background-size: 1px 1px;
+            /* Many small stars - simulated */
+            background-image:
+                radial-gradient(1px 1px at 20px 30px, #fff, rgba(255,255,255,0)),
+                radial-gradient(1px 1px at 40% 50%, #ddd, rgba(255,255,255,0)),
+                radial-gradient(1px 1px at 70% 80%, #fff, rgba(255,255,255,0)),
+                radial-gradient(1px 1px at 90% 10%, #eee, rgba(255,255,255,0)),
+                radial-gradient(1px 1px at 15% 85%, #fff, rgba(255,255,255,0));
+            animation: parallax-scroll-slow 80s linear infinite alternate;
+        }
+
+        /* Layer 2: Nebula / Closer Stars (medium speed) */
+        .stars-near {
+             background:
+                /* Soft nebula cloud */
+                radial-gradient(ellipse at 30% 70%, rgba(80, 80, 150, 0.2) 0%, rgba(80, 80, 150, 0) 60%),
+                /* Bigger/brighter stars */
+                radial-gradient(2px 2px at 10% 20%, #fff, rgba(255,255,255,0)),
+                radial-gradient(3px 3px at 80% 40%, #f0f0ff, rgba(255,255,255,0)),
+                radial-gradient(2px 2px at 50% 90%, #fff, rgba(255,255,255,0));
+            background-size: cover, 2px 2px, 3px 3px, 2px 2px; /* Cover for nebula, specific for stars */
+            opacity: 0.8;
+            animation: parallax-scroll-medium 50s linear infinite alternate;
+        }
+
+         /* Keyframes for subtle background movement */
+        @keyframes parallax-scroll-slow {
+            from { background-position: 0% 0%; }
+            to { background-position: 5% 5%; } /* Slight shift */
+        }
+        @keyframes parallax-scroll-medium {
+            from { background-position: 0% 0%; }
+            to { background-position: 10% 10%; } /* Moderate shift */
+        }
+
+        /* Animated tiny floating stars */
+        @keyframes float {
+            0% { transform: translateY(0px) rotate(0deg); opacity: 0.7; }
+            50% { transform: translateY(-10px) rotate(180deg); opacity: 1; }
+            100% { transform: translateY(0px) rotate(360deg); opacity: 0.7; }
+        }
+
+        .floating-star {
+            position: fixed;
+            width: 5px;
+            height: 5px;
+            background-color: #fff;
+            border-radius: 50%;
+            box-shadow: 0 0 5px #fff, 0 0 10px #fff;
+            animation: float 6s ease-in-out infinite;
+            z-index: -5;
+            pointer-events: none;
+        }
+        /* Place a few stars manually */
+        .star1 { top: 20%; left: 15%; animation-delay: 0s; }
+        .star2 { top: 60%; left: 80%; animation-delay: 2s; width: 3px; height: 3px; }
+        .star3 { top: 80%; left: 30%; animation-delay: 4s; opacity: 0.6; }
+
+
+        /* --- Content Styling --- */
+        .content-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh; /* Ensure wrapper takes full height for centering */
+            padding: 50px 20px; /* Add more padding */
+            box-sizing: border-box;
+        }
+
+        .container {
+            background-color: rgba(15, 15, 35, 0.7); /* Slightly darker, more opaque */
+            backdrop-filter: blur(5px); /* Frosted glass effect */
+            padding: 35px 40px;
+            border-radius: 20px;
+            box-shadow: 0 0 35px var(--glow-color), inset 0 0 10px rgba(200, 200, 255, 0.1); /* Glow + Inset */
+            max-width: 650px;
+            width: 90%;
+            text-align: center;
+            position: relative; /* Needed for pseudo-element shine */
+            z-index: 1;
+            /* Transition for the mouse-tilt effect */
+            transition: transform 0.1s ease-out, box-shadow 0.3s ease;
+            overflow: hidden; /* Contain the shine effect */
+        }
+
+        /* Pokemon Pack Shine Effect (on hover) */
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%; /* Start off-screen */
+            width: 50%; /* Width of the shine beam */
+            height: 100%;
+            background: linear-gradient(
+                to right,
+                transparent 0%,
+                var(--shine-color) 50%,
+                transparent 100%
+            );
+            transform: skewX(-25deg); /* Angle the shine */
+            transition: left 0.6s ease-in-out; /* Animation */
+            z-index: 2; /* Above background, below text */
+            pointer-events: none;
+        }
+
+        .container:hover::before {
+            left: 150%; /* Sweep across */
+        }
+
+         .container:hover {
+             box-shadow: 0 0 50px var(--glow-color), inset 0 0 15px rgba(200, 200, 255, 0.2);
+         }
+
+        h1 {
+            color: #f0f0ff; /* Brighter Lavender */
+            margin-bottom: 15px;
+            font-size: 2.8em;
+            text-shadow: 0 0 8px #fff, 0 0 15px var(--glow-color); /* Enhanced text glow */
+            font-weight: 600;
+        }
+
+        p {
+            font-size: 1.15em;
+            line-height: 1.7;
+            color: #d0d0f0;
+            margin-bottom: 30px;
+        }
+
+        .form-container {
+            margin-top: 25px;
+            text-align: left;
+            position: relative; /* Ensure form elements are above shine */
+            z-index: 3;
+        }
+
+        .form-container label {
+            display: block;
+            margin-bottom: 10px;
+            color: #c0c0e0;
+            font-weight: bold;
+            font-size: 1.05em;
+        }
+
+        .form-container input[type="text"],
+        .form-container textarea {
+            width: calc(100% - 24px);
+            padding: 12px;
+            margin-bottom: 25px;
+            border: 1px solid #5a5a8a;
+            border-radius: 8px;
+            background-color: rgba(30, 30, 60, 0.8); /* Slightly transparent inputs */
+            color: #e0e0e0;
+            font-size: 1em;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .form-container input[type="text"]:focus,
+        .form-container textarea:focus {
+            outline: none;
+            border-color: #a0a0ff;
+            box-shadow: 0 0 10px rgba(160, 160, 255, 0.5);
+        }
+
+        .form-container textarea {
+            min-height: 110px;
+            resize: vertical;
+        }
+
+        .form-container button {
+            background: linear-gradient(45deg, #7b68ee, #9370db); /* Gradient button */
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.2em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.3s ease, background 0.3s ease;
+            display: block;
+            width: 100%;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            position: relative;
+            z-index: 3;
+        }
+
+        .form-container button:hover {
+            background: linear-gradient(45deg, #6a5acd, #8a63c7);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(123, 104, 238, 0.5); /* Glow matching button */
+        }
+        .form-container button:active {
+             transform: translateY(-1px);
+             box-shadow: 0 4px 15px rgba(123, 104, 238, 0.4);
+        }
+
+        .support-flags {
+            margin-top: 35px;
+            font-size: 2.2em;
+            position: relative;
+            z-index: 3;
+        }
+         .support-flags p {
+             font-size: 0.6em; margin-top: 8px; color: #a0a0c0;
+         }
+
+        footer {
+            padding: 20px;
+            text-align: center;
+            font-size: 0.9em;
+            color: #8888a8;
+            width: 100%;
+            margin-top: 30px; /* Ensure space after content */
+            position: relative; /* Keep in flow */
+            z-index: 1; /* Above backgrounds but below potential absolute elements */
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Parallax Background Layers -->
+    <div class="parallax-bg stars-far"></div>
+    <div class="parallax-bg stars-near"></div>
+
+    <!-- Floating Animated Stars -->
+    <div class="floating-star star1"></div>
+    <div class="floating-star star2"></div>
+    <div class="floating-star star3"></div>
+
+    <!-- Main Content Area -->
+    <div class="content-wrapper">
+        <div class="container" id="interactive-container">
+            <h1>galaxywonderland.com</h1>
+            <p>Добро пожаловать в Галактику Чудес v2! Получите мистическое анимированное таро-чтение от нашего местного мага, чтобы осветить свой путь сквозь космос.</p>
+
+            <div class="form-container">
+                <form action="#" method="post"> <!-- Replace # with your form processing URL -->
+                    <label for="name">Имя:</label>
+                    <input type="text" id="name" name="name" required>
+
+                    <label for="question">Ваш вопрос к картам Таро:</label>
+                    <textarea id="question" name="question" required></textarea>
+
+                    <button type="submit">Задать вопрос Магу</button>
+                </form>
+            </div>
+
+            <div class="support-flags">
+                <span>🏳️‍🌈</span>
+                <span style="margin-left: 15px;">🇺🇦</span>
+                <p>Мы поддерживаем разнообразие и суверенитет.</p>
+            </div>
+        </div> <!-- End container -->
+    </div> <!-- End content-wrapper -->
+
+    <footer>
+        © galaxywonderland.com. All rights registered and already corrupted. | Animated Version
+    </footer>
+
+    <script>
+        const container = document.getElementById('interactive-container');
+        const wrapper = document.querySelector('.content-wrapper'); // Use wrapper for mouse coords
+
+        // Mouse Move Tilt Effect
+        wrapper.addEventListener('mousemove', (e) => {
+            // Get mouse position relative to the center of the viewport (simpler)
+            const rect = wrapper.getBoundingClientRect();
+            const x = e.clientX - rect.left; // x position within the element.
+            const y = e.clientY - rect.top;  // y position within the element.
+
+            const centerX = rect.width / 2;
+            const centerY = rect.height / 2;
+
+            const deltaX = (x - centerX) / centerX; // -1 to 1 range
+            const deltaY = (y - centerY) / centerY; // -1 to 1 range
+
+            const maxRotate = 5; // Max tilt in degrees
+
+            // Apply the transform. RotateY based on horizontal mouse pos, RotateX based on vertical
+            container.style.transform = `rotateY(${deltaX * maxRotate * -1}deg) rotateX(${deltaY * maxRotate}deg)`;
+        });
+
+        // Reset tilt when mouse leaves the wrapper
+        wrapper.addEventListener('mouseleave', () => {
+            container.style.transform = 'rotateY(0deg) rotateX(0deg)';
+        });
+
+        // Simple Scroll Parallax for background layers (if needed - CSS handles basic animation now)
+        // For more advanced scroll parallax, you'd track scrollY and adjust background-position dynamically
+        // window.addEventListener('scroll', () => {
+        //     const scrollY = window.pageYOffset;
+        //     const farStars = document.querySelector('.stars-far');
+        //     const nearStars = document.querySelector('.stars-near');
+
+        //     // Adjust background position based on scroll (example factors)
+        //     // This might conflict with CSS animation, choose one method or combine carefully
+        //     // farStars.style.backgroundPositionY = `${scrollY * 0.1}px`;
+        //     // nearStars.style.backgroundPositionY = `${scrollY * 0.3}px`;
+        // });
+
+    </script>
+
+</body>
+</html>
