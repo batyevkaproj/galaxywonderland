@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GALAXY WONDERLAND - BLACKMAGIC RITUAL</title>
+    <meta name="description" content="Получите точное таро-чтение онлайн от опытного местного мага на Galaxy Wonderland. Узнайте свое будущее сегодня!">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Metal+Mania&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Adjusted glow colors to be more intense and specific to the reference */
+            --electric-blue-glow: rgba(0, 191, 255, 0.7); /* Deep sky blue / Electric blue */
+            --purple-glow: rgba(170, 0, 255, 0.6); /* Vibrant purple */
+            --main-font: 'Metal Mania', cursive;
+            --body-font: 'Roboto', sans-serif;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: var(--body-font);
+            background-color: #000000; /* Pure black base */
+            color: #f0f0f0; /* Off-white for text */
+            min-height: 100vh;
+            perspective: 1000px;
+            overflow: hidden; /* Prevent scrollbars from canvas/content */
+            /* Subtle noise effect */
+            position: relative;
+        }
+
+        body::before { /* Noise overlay */
+            content: '';
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            width: 100%; height: 100%;
+            opacity: 0.07; /* Adjust for intensity */
+            z-index: -9; /* Just above canvas, below content */
+            pointer-events: none;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100"><filter id="n"><feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="6" stitchTiles="stitch"/></filter><rect width="100" height="100" filter="url(#n)" opacity="0.4"/></svg>');
+        }
+
+
+        #starfield {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -10;
+            display: block;
+        }
+
+        .content-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 40px 20px;
+            box-sizing: border-box;
+            position: relative;
+            z-index: 1;
+        }
+
+        .container {
+            background-color: rgba(5, 5, 15, 0.6); /* Darker, less transparent */
+            backdrop-filter: blur(3px); /* Slightly less blur */
+            padding: 30px 35px;
+            border-radius: 10px; /* Sharper radius */
+            border: 1px solid rgba(100, 100, 150, 0.2); /* Faint structural border */
+            box-shadow: 0 0 45px var(--electric-blue-glow), 0 0 70px var(--purple-glow), inset 0 0 10px rgba(50, 50, 100, 0.2);
+            max-width: 600px; /* Slightly smaller */
+            width: 90%;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+            transition: transform 0.1s ease-out, box-shadow 0.3s ease;
+            overflow: visible; /* Allow SVG glow to escape */
+        }
+        /* Remove default shine, it doesn't fit */
+        .container::before { display: none; }
+        .container:hover {
+             box-shadow: 0 0 60px var(--electric-blue-glow), 0 0 90px var(--purple-glow), inset 0 0 15px rgba(80, 80, 150, 0.3);
+        }
+
+        /* SVG Styling for Triangle and Pentagram */
+        .background-symbol {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 280px; /* Adjust size as needed */
+            height: 280px;
+            transform: translate(-50%, -50%);
+            z-index: 0; /* Behind container content */
+            opacity: 0.6; /* Make it slightly subdued */
+            pointer-events: none;
+        }
+
+        .background-symbol svg {
+            width: 100%;
+            height: 100%;
+            overflow: visible; /* Important for glows */
+        }
+
+        .triangle-path {
+            fill: none;
+            stroke: rgba(200, 220, 255, 0.7); /* White-ish blue */
+            stroke-width: 3;
+            filter: url(#glow-filter);
+        }
+
+        .pentagram-path {
+            fill: none;
+            stroke: rgba(220, 200, 255, 0.6); /* White-ish purple */
+            stroke-width: 2;
+            opacity: 0.8;
+            filter: url(#glow-filter-subtle);
+        }
+
+
+        h1 {
+            font-family: var(--main-font);
+            color: #ffffff;
+            margin-bottom: 20px;
+            font-size: 3.8em; /* Larger */
+            letter-spacing: 2px;
+            text-shadow:
+                0 0 10px var(--electric-blue-glow),
+                0 0 20px var(--electric-blue-glow),
+                0 0 30px var(--purple-glow),
+                0 0 40px var(--purple-glow),
+                2px 2px 2px #000, /* Hard shadow for outline */
+                -1px -1px 1px #333; /* Softer edge for outline */
+            font-weight: normal;
+            position: relative; z-index: 3;
+            line-height: 1.1;
+        }
+
+        p {
+            font-family: var(--body-font);
+            font-size: 1.1em;
+            line-height: 1.6;
+            color: #c0c0d0; /* Lighter grey */
+            margin-bottom: 25px;
+            position: relative; z-index: 3;
+            font-weight: 300;
+        }
+
+        .form-container { margin-top: 20px; text-align: left; position: relative; z-index: 3; }
+        .form-container label {
+            display: block; margin-bottom: 8px; color: #b0b0c0;
+            font-weight: 500; font-size: 0.95em;
+            font-family: var(--body-font);
+        }
+        .form-container input[type="text"],
+        .form-container textarea {
+            width: calc(100% - 20px); padding: 10px; margin-bottom: 20px;
+            border: 1px solid rgba(120, 120, 180, 0.4);
+            border-radius: 4px; /* Sharper */
+            background-color: rgba(0, 0, 10, 0.7); /* Darker input */
+            color: #e0e0e0; font-size: 1em;
+            font-family: var(--body-font);
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        .form-container input[type="text"]:focus,
+        .form-container textarea:focus {
+            outline: none;
+            border-color: var(--electric-blue-glow);
+            box-shadow: 0 0 12px var(--electric-blue-glow);
+        }
+        .form-container textarea { min-height: 100px; resize: vertical; }
+
+        .form-container button {
+            font-family: var(--main-font);
+            background: linear-gradient(45deg, #2a004f, #002257); /* Dark Purple to Dark Blue */
+            color: white; padding: 12px 25px; border: 1px solid rgba(150, 150, 220, 0.5);
+            border-radius: 5px; font-size: 1.5em; letter-spacing: 1px;
+            font-weight: normal; cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.3s ease, background 0.3s ease; display: block;
+            width: 100%;
+            text-shadow: 1px 1px 1px #000, 0 0 10px var(--purple-glow);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4), 0 0 15px var(--purple-glow);
+            position: relative; z-index: 3;
+        }
+        .form-container button:hover {
+            background: linear-gradient(45deg, #3c0070, #003380);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(80, 0, 120, 0.6), 0 0 25px var(--electric-blue-glow);
+        }
+        .form-container button:active { transform: translateY(0px); }
+
+        .support-flags { margin-top: 30px; font-size: 1.8em; position: relative; z-index: 3; opacity: 0.7;}
+        .support-flags p {
+            font-family: var(--body-font);
+            font-size: 0.5em; margin-top: 5px; color: #808090;
+            font-weight: 400;
+        }
+
+        /* Social Media Icons - More gritty */
+        .social-media-icons {
+            margin-top: 25px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            gap: 20px;
+            position: relative;
+            z-index: 3;
+            opacity: 0.8;
+        }
+        .social-item { display: flex; flex-direction: column; align-items: center; gap: 5px; }
+        .social-icon {
+            width: 38px; height: 38px;
+            border: 1.5px solid rgba(150, 150, 200, 0.3);
+            /* Removed background-color, let it be transparent or inherit from parent */
+        }
+        .social-icon:hover {
+            border-color: var(--electric-blue-glow);
+            transform: translateY(-2px) scale(1.05) rotate(5deg); /* Added slight rotate */
+            box-shadow: 0 0 10px var(--electric-blue-glow);
+        }
+        .social-label {
+            font-family: var(--body-font); /* Or main-font if you want it very stylized */
+            font-size: 0.65em; color: #9090a0; font-weight: 400;
+            text-transform: uppercase; letter-spacing: 1px;
+        }
+        /* Removing specific icon drawings, as they won't fit. If needed, use actual simple icons or text */
+        .tiktok-icon > i, .telegram-icon::before, .telegram-icon::after, .youtube-icon::before {
+            /* Simplifiying/hiding the CSS-drawn icons - they clash with the new theme */
+            /* For this theme, simple text or actual SVG icons would be better */
+             opacity: 0.6; /* Make existing ones very faint as placeholders */
+        }
+        .tiktok-icon > .tiktok-head, .tiktok-icon > .tiktok-stem, .tiktok-icon > .tiktok-flag {
+            background-color: #88a !important; border-color: #88a !important;
+        }
+         .telegram-icon::before, .telegram-icon::after { border-color: transparent transparent transparent #88a !important; }
+         .youtube-icon::before { border-color: transparent transparent transparent #88a !important; }
+
+
+        footer {
+            padding: 15px; text-align: center; font-size: 0.8em; color: #606070;
+            width: 100%; margin-top: 25px; position: relative; z-index: 1;
+            font-family: var(--body-font); font-weight: 300;
+            text-shadow: 1px 1px 2px #000;
+        }
+
+    </style>
+</head>
+<body>
+    <!-- SVG Filters for Glow -->
+    <svg width="0" height="0" style="position:absolute;visibility:hidden;">
+        <defs>
+            <filter id="glow-filter" x="-50%" y="-50%" width="200%" height="200%">
+                <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+                <feMerge>
+                    <feMergeNode in="coloredBlur"/>
+                    <feMergeNode in="SourceGraphic"/>
+                </feMerge>
+            </filter>
+            <filter id="glow-filter-subtle" x="-50%" y="-50%" width="200%" height="200%">
+                <feGaussianBlur stdDeviation="2.5" result="coloredBlurSubtle"/>
+                <feMerge>
+                    <feMergeNode in="coloredBlurSubtle"/>
+                    <feMergeNode in="SourceGraphic"/>
+                </feMerge>
+            </filter>
+        </defs>
+    </svg>
+
+    <canvas id="starfield"></canvas>
+
+    <div class="content-wrapper">
+        <div class="container" id="interactive-container">
+            <!-- Background Symbol -->
+            <div class="background-symbol">
+                <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Inverted Triangle -->
+                    <polygon class="triangle-path" points="50,15 85,85 15,85" />
+                    <!-- Pentagram (simple version) -->
+                    <!-- Calculated points for a pentagram inscribed in a circle of radius ~28, centered in triangle -->
+                    <polygon class="pentagram-path" points="
+                        50,36.4
+                        58.2,60.1
+                        35.5,48.3
+                        64.5,48.3
+                        41.8,60.1
+                    "/>
+                </svg>
+            </div>
+
+            <h1>GALAXY<br>WONDERLAND</h1> <!-- Updated to use the style, maybe a line break for effect -->
+            <p>Добро пожаловать в темные ритуалы Галактики Чудес. Узнайте свою судьбу через мистическое таро.</p>
+
+            <div class="form-container">
+                <form action="#" method="post">
+                    <label for="name">Имя Посвященного:</label>
+                    <input type="text" id="name" name="name" required placeholder="Ваше имя...">
+
+                    <label for="question">Запрос к Теням (Таро):</label>
+                    <textarea id="question" name="question" required placeholder="Сформулируйте ваш вопрос..."></textarea>
+
+                    <button type="submit">Призвать Мага</button>
+                </form>
+            </div>
+
+            <div class="support-flags">
+                <span>👁️</span> <!-- Replaced flags with an eye symbol for thematic consistency -->
+                <span style="margin-left: 15px;">🗝️</span> <!-- And a key symbol -->
+                <p>Мы видим за гранью. Мы открываем пути.</p>
+            </div>
+
+            <div class="social-media-icons">
+                <div class="social-item">
+                    <a href="#" aria-label="TikTok" class="social-icon tiktok-icon" target="_blank" rel="noopener noreferrer">
+                        <i class="tiktok-stem"></i><i class="tiktok-head"></i><i class="tiktok-flag"></i>
+                    </a>
+                    <span class="social-label">TikTok</span>
+                </div>
+                <div class="social-item">
+                    <a href="#" aria-label="Telegram" class="social-icon telegram-icon" target="_blank" rel="noopener noreferrer"></a>
+                    <span class="social-label">Telegram</span>
+                </div>
+                <div class="social-item">
+                    <a href="#" aria-label="YouTube" class="social-icon youtube-icon" target="_blank" rel="noopener noreferrer"></a>
+                    <span class="social-label">YouTube</span>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <footer>
+        © GALAXY WONDERLAND. Все права искажены и во мраке погребены. | Starfield Ritual v6.6.6
+    </footer>
+
+    <script>
+        // --- Starfield Canvas ---
+        const canvas = document.getElementById('starfield');
+        const ctx = canvas.getContext('2d');
+
+        let stars = [];
+        const numStars = 250; // Slightly fewer for a grittier feel perhaps
+        const baseSpeedFactor = 0.02;
+        const shootingStarProbability = 0.001;
+        const shootingSpeedFactor = 10;
+        const maxTailLength = 25;
+        let activeShootingStar = null;
+
+        function setCanvasSize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+
+        function initStars() {
+            stars = [];
+            activeShootingStar = null;
+            for (let i = 0; i < numStars; i++) {
+                stars.push(createStar());
+             }
+        }
+
+        function createStar(yPos = Math.random() * canvas.height) {
+             const radius = Math.random() * 1.2 + 0.3; // Smaller, sharper stars
+             return {
+                x: Math.random() * canvas.width,
+                y: yPos,
+                radius: radius,
+                alpha: Math.random() * 0.4 + 0.3, // Less bright overall
+                speed: radius * baseSpeedFactor + 0.015,
+                isShooting: false,
+                shootingAngle: 0,
+                shootingSpeed: 0,
+                tail: [],
+                originalAlpha: 0
+            };
+        }
+
+        function tryStartShootingStar() {
+            if (activeShootingStar || Math.random() > shootingStarProbability || stars.length === 0) return;
+            let candidate = null;
+            let attempts = 0;
+            while (!candidate && attempts < stars.length) {
+                 let potentialStar = stars[Math.floor(Math.random() * stars.length)];
+                 if (!potentialStar.isShooting) candidate = potentialStar;
+                 attempts++;
+            }
+            if (candidate) {
+                activeShootingStar = candidate;
+                candidate.isShooting = true;
+                candidate.originalAlpha = candidate.alpha;
+                candidate.alpha = 0.9; // Shooting stars still quite bright
+                const angleVariation = (Math.random() - 0.5) * (Math.PI / 8); // Less horizontal variation
+                candidate.shootingAngle = (Math.PI / 2) + angleVariation;
+                candidate.shootingSpeed = (candidate.radius * baseSpeedFactor * shootingSpeedFactor) + 1.5;
+                candidate.tail = [];
+            }
+        }
+
+        function drawStars() {
+            // Darker gradient for the starfield background
+            const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+            gradient.addColorStop(0, '#030310'); // Very dark blue/purple
+            gradient.addColorStop(1, '#000005'); // Almost black
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            stars.forEach(star => {
+                if (star.isShooting) drawShootingStar(star);
+                else drawNormalStar(star);
+            });
+        }
+
+        function drawNormalStar(star) {
+            ctx.beginPath();
+            ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(200, 200, 220, ${star.alpha})`; // More muted star color
+            ctx.fill();
+        }
+
+        function drawShootingStar(star) {
+            ctx.beginPath();
+            ctx.moveTo(star.x, star.y);
+            for (let i = star.tail.length - 1; i >= 0; i--) {
+                 const segment = star.tail[i];
+                 ctx.lineTo(segment.x, segment.y);
+            }
+            ctx.lineWidth = star.radius * 1.3;
+            ctx.strokeStyle = `rgba(220, 220, 255, ${star.alpha * 0.5})`; // More ethereal tail
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.arc(star.x, star.y, star.radius * 1.1, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(255, 255, 255, ${star.alpha})`;
+            ctx.shadowColor = 'rgba(150, 150, 255, 0.7)'; // More blue/purple glow
+            ctx.shadowBlur = 6;
+            ctx.fill();
+            ctx.shadowBlur = 0;
+        }
+
+        function updateStars() {
+            tryStartShootingStar();
+            stars.forEach((star, index) => {
+                if (star.isShooting) updateShootingStar(star);
+                else updateNormalStar(star, index);
+            });
+        }
+
+        function updateNormalStar(star, index) {
+             star.y += star.speed;
+            if (star.y > canvas.height + star.radius * 5) {
+                stars[index] = createStar(-star.radius);
+            }
+        }
+
+        function updateShootingStar(star) {
+            star.tail.unshift({ x: star.x, y: star.y, alpha: star.alpha });
+            if (star.tail.length > maxTailLength) star.tail.pop();
+            star.x += Math.cos(star.shootingAngle) * star.shootingSpeed;
+            star.y += Math.sin(star.shootingAngle) * star.shootingSpeed;
+            const offScreenX = star.x < -star.radius * 5 || star.x > canvas.width + star.radius * 5;
+            const offScreenY = star.y < -star.radius * 5 || star.y > canvas.height + star.radius * 5;
+             if (offScreenX || offScreenY) {
+                 star.isShooting = false;
+                 star.alpha = star.originalAlpha;
+                 star.tail = [];
+                 star.x = Math.random() * canvas.width;
+                 star.y = -star.radius;
+                 activeShootingStar = null;
+             }
+        }
+
+        function animate() {
+            updateStars();
+            drawStars();
+            requestAnimationFrame(animate);
+        }
+
+        window.addEventListener('resize', () => {
+            setCanvasSize();
+            initStars();
+        });
+
+        // Mouse Tilt Effect - Keep it, it adds a bit of unease
+        const interactiveContainer = document.getElementById('interactive-container'); // Renamed for clarity
+        const contentWrapper = document.querySelector('.content-wrapper'); // Renamed for clarity
+
+        if (interactiveContainer && contentWrapper) { // Check if elements exist
+            contentWrapper.addEventListener('mousemove', (e) => {
+                const rect = contentWrapper.getBoundingClientRect();
+                const x = e.clientX - rect.left; const y = e.clientY - rect.top;
+                const centerX = rect.width / 2; const centerY = rect.height / 2;
+                const deltaX = (x - centerX) / centerX; const deltaY = (y - centerY) / centerY;
+                const maxRotate = 3; // Reduced rotation for a subtler effect
+                interactiveContainer.style.transform = `rotateY(${deltaX * maxRotate * -1}deg) rotateX(${deltaY * maxRotate}deg) translateZ(10px)`; // Added slight Z
+            });
+            contentWrapper.addEventListener('mouseleave', () => {
+                interactiveContainer.style.transform = 'rotateY(0deg) rotateX(0deg) translateZ(0px)';
+            });
+        }
+
+
+        // Initial setup
+        setCanvasSize();
+        initStars();
+        animate();
+    </script>
+
+</body>
+</html> 
